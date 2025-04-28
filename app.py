@@ -111,6 +111,9 @@ def list_items():
         else:
             query += ' WHERE storage.location_id = ?'
         params.append(location_filter)
+ 
+    # Add ORDER BY to sort by item name in alphabetical order
+    query += ' ORDER BY storage.item ASC'  # This will order the items alphabetically (ascending)
 
     # Execute the query with filters applied
     items = conn.execute(query, params).fetchall()
