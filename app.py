@@ -1,53 +1,15 @@
 from flask import Flask, render_template, request, redirect
-import sqlite3
+import psycopg2
 import os
 
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-DB_PATH = os.path.join(BASE_DIR, 'database.db')
-
-def setup_db():
-    conn = sqlite3.connect(DB_PATH)
-    c = conn.cursor()
-
-    # Create categories table
-    c.execute('''
-        CREATE TABLE IF NOT EXISTS categories (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            name TEXT UNIQUE NOT NULL
-        );
-    ''')
-
-    # Create locations table
-    c.execute('''
-        CREATE TABLE IF NOT EXISTS locations (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            name TEXT UNIQUE NOT NULL
-        );
-    ''')
-
-    # Insert initial categories
-    c.execute("INSERT OR IGNORE INTO categories (name) VALUES ('Altro')")
-    c.execute("INSERT OR IGNORE INTO categories (name) VALUES ('Viaggio')")
-    c.execute("INSERT OR IGNORE INTO categories (name) VALUES ('Vestiti')")
-
-    # Insert initial locations
-    c.execute("INSERT OR IGNORE INTO locations (name) VALUES ('Solaio Nonno')")
-    c.execute("INSERT OR IGNORE INTO locations (name) VALUES ('Garage Tatona')")
-    c.execute("INSERT OR IGNORE INTO locations (name) VALUES ('Garage Tatina')")
-    c.execute("INSERT OR IGNORE INTO locations (name) VALUES ('Solaio Nostro')")
-
-    conn.commit()
-    conn.close()
-
-# Run the setup when app starts
-setup_db()
+# Load the DATABASE_URL from environment variable (set this in Render.com or a .env file)
+DATABASE_URL = os.environ.get('DATABASE_URL')
 
 app = Flask(__name__)
 
-# Function to connect to the database
+# Function to connect to the Supabase PostgreSQL database
 def get_db_connection():
-    conn = sqlite3.connect('database.db')
-    conn.row_factory = sqlite3.Row  # This makes the data easier to use
+    conn = psycopg2.connect(DATABASE_URL)
     return conn
 
 # Home page to add new items
